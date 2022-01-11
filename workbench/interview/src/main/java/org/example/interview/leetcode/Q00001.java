@@ -5,6 +5,8 @@ import org.example.interview.annotations.Level;
 import org.example.interview.annotations.Result;
 import org.example.interview.annotations.Tag;
 
+import java.util.*;
+
 /**
  * @author qbq
  * @date 2022/1/10 5:43 PM
@@ -26,12 +28,21 @@ public class Q00001 {
      * 链接：https://leetcode-cn.com/problems/two-sum
      * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
      */
-    @LeetCode(tags = {Tag.math}, level = Level.easy)
+    @LeetCode(tags = {Tag.array, Tag.hash_table}, level = Level.easy)
     @Result("结果超时")
     class Solution {
+
         public int[] twoSum(int[] nums, int target) {
-            return null;
+            Map<Integer, Integer> hashtable = new HashMap<Integer, Integer>();
+            for (int i = 0; i < nums.length; ++i) {
+                if (hashtable.containsKey(target - nums[i])) {
+                    return new int[]{hashtable.get(target - nums[i]), i};
+                }
+                hashtable.put(nums[i], i);
+            }
+            return new int[0];
         }
+
     }
 
 }
