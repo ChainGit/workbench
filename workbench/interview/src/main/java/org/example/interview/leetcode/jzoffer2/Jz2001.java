@@ -1,10 +1,10 @@
-package org.example.interview.jzoffer2;
+package org.example.interview.leetcode.jzoffer2;
 
 import org.example.core.util.ConsoleUtils;
-import org.example.interview.annotations.LevelEasy;
+import org.example.interview.annotations.LeetCode;
+import org.example.interview.annotations.Level;
 import org.example.interview.annotations.Result;
-import org.example.interview.annotations.TagBitCalc;
-import org.example.interview.annotations.TagMath;
+import org.example.interview.annotations.Tag;
 
 /**
  * @author qbq
@@ -41,10 +41,8 @@ public class Jz2001 {
      * 链接：https://leetcode-cn.com/problems/xoh6Oh
      * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
      */
+    @LeetCode(tags = {Tag.math}, level = Level.easy)
     @Result("结果超时")
-    @LevelEasy
-    @TagBitCalc
-    @TagMath
     static class Solution {
 
         public int divide(final int a, final int b) {
