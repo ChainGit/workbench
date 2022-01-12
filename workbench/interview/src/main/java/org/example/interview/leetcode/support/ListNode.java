@@ -12,36 +12,38 @@ import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 public class ListNode {
-    int val;
-    ListNode next;
 
-    ListNode() {
+    public int val;
+    public ListNode next;
+
+    public ListNode() {
     }
 
-    ListNode(int val) {
+    public ListNode(int val) {
         this.val = val;
     }
 
-    ListNode(int val, ListNode next) {
+    public ListNode(int val, ListNode next) {
         this.val = val;
         this.next = next;
     }
 
     public static ListNode of(int[] arr) {
         ListNode head = null;
+        ListNode curr = head;
         for (int num : arr) {
-            ListNode node = new ListNode();
+            ListNode node = new ListNode(num);
             if (Objects.isNull(head)) {
-                head = node;
+                curr = head = node;
             } else {
-                head.next = node;
+                curr.next = node;
+                curr = curr.next;
             }
-            node.val = num;
         }
         return head;
     }
 
-    private static ListNode of(List<Integer> lst) {
+    public static ListNode of(List<Integer> lst) {
         return of(ArrayUtils.toPrimitive(lst.toArray(new Integer[]{})));
     }
 

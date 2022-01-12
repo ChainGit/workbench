@@ -1,10 +1,7 @@
 package org.example.interview.leetcode;
 
 import org.example.core.util.ConsoleUtils;
-import org.example.interview.annotations.LeetCode;
-import org.example.interview.annotations.Level;
-import org.example.interview.annotations.Result;
-import org.example.interview.annotations.Tag;
+import org.example.interview.annotations.*;
 
 import java.util.*;
 
@@ -30,8 +27,10 @@ public class Q0001 {
      * 链接：https://leetcode-cn.com/problems/two-sum
      * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
      */
-    @LeetCode(tags = {Tag.array, Tag.hash_table}, level = Level.easy)
-    @Result("结果超时")
+    @LeetCodeEasy({Tag.array, Tag.hash_table})
+    /**
+     * 结果超时
+     */
     static class Solution {
 
         public int[] twoSum(int[] nums, int target) {

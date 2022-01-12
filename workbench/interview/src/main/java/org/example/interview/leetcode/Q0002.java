@@ -1,9 +1,8 @@
 package org.example.interview.leetcode;
 
 import org.example.core.util.ConsoleUtils;
+import org.example.interview.annotations.*;
 import org.example.interview.leetcode.support.ListNode;
-
-import java.util.List;
 
 /**
  * @author qbq
@@ -12,8 +11,8 @@ import java.util.List;
 public class Q0002 {
 
     public static void main(String[] args) {
-        ListNode node = new Solution().addTwoNumbers(ListNode.of("[2,4,3]"), ListNode.of("[5,6,4]"));
-        ConsoleUtils.sout(node);
+        ConsoleUtils.sout(new Solution().addTwoNumbers(ListNode.of("[2,4,3]"), ListNode.of("[5,6,4]")));
+        ConsoleUtils.sout(new Solution().addTwoNumbers(ListNode.of("[1,8]"), ListNode.of("[0]")));
     }
 
     /**
@@ -27,10 +26,32 @@ public class Q0002 {
      * 链接：https://leetcode-cn.com/problems/add-two-numbers
      * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
      */
+    @LeetCodeMiddle({Tag.linked_list, Tag.math, Tag.recursion})
+    /**
+     * 执行用时 1 ms, 在所有 Java 提交中击败了100.00%的用户
+     * 内存消耗：38.9 MB, 在所有 Java 提交中击败了11.14%的用户
+     * 通过测试用例：1568 / 1568
+     */
     static class Solution {
 
         public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
-            return null;
+            ListNode head = new ListNode();
+            ListNode cur = head;
+            ListNode n1 = l1;
+            ListNode n2 = l2;
+            while (n1 != null || n2 != null) {
+                int sum = (n1 != null ? n1.val : 0) + (n2 != null ? n2.val : 0) + cur.val;
+                int res = sum % 10;
+                int mod = sum / 10;
+                cur.val = res;
+                n1 = (n1 != null && n1.next != null) ? n1.next : null;
+                n2 = (n2 != null && n2.next != null) ? n2.next : null;
+                if (n1 != null || n2 != null || mod > 0) {
+                    cur.next = new ListNode(mod);
+                    cur = cur.next;
+                }
+            }
+            return head;
         }
 
     }
