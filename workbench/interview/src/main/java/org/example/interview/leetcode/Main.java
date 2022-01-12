@@ -8,7 +8,7 @@ import org.apache.commons.lang3.reflect.MethodUtils;
  */
 public class Main {
 
-    private static final Class<?> CLZ = Q0001.class;
+    private static final Class<?> CLZ = Q0002.class;
 
     public static void main(String[] args) throws Throwable {
         MethodUtils.invokeStaticMethod(CLZ, "main", new String[][]{new String[]{}}, new Class[]{String[].class});

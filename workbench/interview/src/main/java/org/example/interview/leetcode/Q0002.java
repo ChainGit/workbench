@@ -1,5 +1,10 @@
 package org.example.interview.leetcode;
 
+import org.example.core.util.ConsoleUtils;
+import org.example.interview.leetcode.support.ListNode;
+
+import java.util.List;
+
 /**
  * @author qbq
  * @date 2022/1/12 10:37 AM
@@ -7,7 +12,8 @@ package org.example.interview.leetcode;
 public class Q0002 {
 
     public static void main(String[] args) {
-
+        ListNode node = new Solution().addTwoNumbers(ListNode.of("[2,4,3]"), ListNode.of("[5,6,4]"));
+        ConsoleUtils.sout(node);
     }
 
     /**
@@ -21,10 +27,12 @@ public class Q0002 {
      * 链接：https://leetcode-cn.com/problems/add-two-numbers
      * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
      */
-    class Solution {
+    static class Solution {
+
         public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
             return null;
         }
+
     }
 
 }
