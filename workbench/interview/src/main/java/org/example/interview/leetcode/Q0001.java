@@ -1,5 +1,6 @@
 package org.example.interview.leetcode;
 
+import org.example.core.util.ConsoleUtils;
 import org.example.interview.annotations.LeetCode;
 import org.example.interview.annotations.Level;
 import org.example.interview.annotations.Result;
@@ -11,10 +12,11 @@ import java.util.*;
  * @author qbq
  * @date 2022/1/10 5:43 PM
  */
-public class Q00001 {
+public class Q0001 {
 
     public static void main(String[] args) {
-
+        int[] res = new Solution().twoSum(new int[]{1, 2, 3}, 3);
+        ConsoleUtils.jout(res);
     }
 
     /**
@@ -30,7 +32,7 @@ public class Q00001 {
      */
     @LeetCode(tags = {Tag.array, Tag.hash_table}, level = Level.easy)
     @Result("结果超时")
-    class Solution {
+    static class Solution {
 
         public int[] twoSum(int[] nums, int target) {
             Map<Integer, Integer> hashtable = new HashMap<Integer, Integer>();
