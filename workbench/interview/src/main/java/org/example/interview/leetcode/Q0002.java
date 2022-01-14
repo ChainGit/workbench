@@ -37,6 +37,7 @@ public class Q0002 {
         public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
             ListNode head = new ListNode();
             ListNode cur = head;
+            // 双指针
             ListNode n1 = l1;
             ListNode n2 = l2;
             while (n1 != null || n2 != null) {

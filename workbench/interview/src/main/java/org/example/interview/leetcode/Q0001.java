@@ -34,6 +34,7 @@ public class Q0001 {
     static class Solution {
 
         public int[] twoSum(int[] nums, int target) {
+            // hashtable做缓存，优化双重循环
             Map<Integer, Integer> hashtable = new HashMap<Integer, Integer>();
             for (int i = 0; i < nums.length; ++i) {
                 if (hashtable.containsKey(target - nums[i])) {
