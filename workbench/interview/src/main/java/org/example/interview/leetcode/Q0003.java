@@ -23,6 +23,12 @@ public class Q0003 {
      * 给定一个字符串 s ，请你找出其中不含有重复字符的 最长子串 的长度。
      */
     @LeetCodeMiddle({Tag.hash_table, Tag.string, Tag.sliding_window})
+    /**
+     * 987 / 987 个通过测试用例
+     * 状态：通过
+     * 执行用时: 2 ms
+     * 内存消耗: 38.5 MB
+     */
     static class Solution {
         public int lengthOfLongestSubstring(String s) {
             char[] chs = s.toCharArray();
