@@ -20,7 +20,10 @@ public class MyTestA {
     );
 
     public static void main(String[] args) {
-        List<String> lst = Lists.newArrayList(LST);
+        execute(Lists.newArrayList(LST));
+    }
+
+    private static void execute(List<String> lst) {
         // 洗牌
         Collections.shuffle(lst);
         ConsoleUtils.sout(lst);

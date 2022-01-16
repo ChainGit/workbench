@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.example.core.util.ConsoleUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -19,7 +20,12 @@ public class MyTestB {
     );
 
     public static void main(String[] args) {
-        List<String> lst = Lists.newArrayList(LST);
+        execute(Lists.newArrayList(LST));
+    }
+
+    private static void execute(List<String> lst) {
+        // 洗牌
+        Collections.shuffle(lst);
         Random rand = new Random();
         // 挑一个
         int idx = rand.nextInt(lst.size());
