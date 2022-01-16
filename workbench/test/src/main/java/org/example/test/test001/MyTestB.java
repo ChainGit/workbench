@@ -16,7 +16,7 @@ import java.util.Random;
 public class MyTestB {
 
     private static final List<String> LST = Lists.newArrayList(
-            "星期一", "星期二", "星期三", "星期四", "星期五", "休息"
+            "星期一", "星期二", "星期三", "星期四", "星期五"
     );
 
     public static void main(String[] args) {
