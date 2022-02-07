@@ -1,5 +1,6 @@
 package org.example.interview.leetcode;
 
+import org.example.core.util.ConsoleUtils;
 import org.example.interview.annotations.LeetCodeEasy;
 import org.example.interview.annotations.LeetCodeMiddle;
 import org.example.interview.annotations.Tag;
@@ -12,7 +13,7 @@ import org.example.interview.leetcode.support.ListNode;
 public class Q0021 {
 
     public static void main(String[] args) {
-
+        ConsoleUtils.sout(new Solution().mergeTwoLists(ListNode.of("1,3,5"), ListNode.of("2,4,6")));
     }
 
     /**
