@@ -71,6 +71,27 @@ public class Sort {
          */
 
         /**
+         * 插入排序（Insertion-Sort）的算法描述是一种简单直观的排序算法。
+         * 它的工作原理是通过构建有序序列，对于未排序数据，在已排序序列中从后向前扫描，找到相应位置并插入。
+         * <p>
+         * 算法描述：
+         * 一般来说，插入排序都采用in-place在数组上实现。具体算法描述如下：
+         * <p>
+         * 1、从第一个元素开始，该元素可以认为已经被排序；
+         * 2、取出下一个元素，在已经排序的元素序列中从后向前扫描；
+         * 3、如果该元素（已排序）大于新元素，将该元素移到下一位置；
+         * 4、重复步骤3，直到找到已排序的元素小于或者等于新元素的位置；
+         * 5、将新元素插入到该位置后；
+         * 重复步骤2~5。
+         */
+        public List<T> insert(Iterable<T> itr) {
+            T[] arr = toArr(itr);
+            if (arr == null) {
+                return Lists.newArrayList();
+            }
+        }
+
+        /**
          * 选择排序(Selection-sort)是一种简单直观的排序算法。
          * 它的工作原理：
          * 首先在未排序序列中找到最小（大）元素，存放到排序序列的起始位置，
@@ -101,6 +122,7 @@ public class Sort {
                     }
                 }
                 if (mdx != idx) {
+                    // 两两交换
                     T tmp = arr[idx];
                     arr[idx] = arr[mdx];
                     arr[mdx] = tmp;
@@ -121,6 +143,13 @@ public class Sort {
          * 3、针对所有的元素重复以上的步骤，除了最后一个；
          * 重复步骤1~3，直到排序完成。
          */
+        /*
+         * 冒泡 逐个两两比较，可能需要频繁移动
+         * 时间复杂度 平均O(n2)，最好O(n)，最差O(n2)
+         * 空间复杂度 O(1)
+         * 稳定排序
+         * 改进：鸡尾酒排序（即内部两次循环，先将大的往右边移动，然后再将小的往左侧移动）
+         */
         public List<T> bubble(Iterable<T> itr) {
             T[] arr = toArr(itr);
             if (arr == null) {
@@ -129,13 +158,19 @@ public class Sort {
             int len = arr.length;
             // 外部循环len-1次
             for (int idx = 0; idx < len; idx++) {
+                boolean sorted = true;
                 // 内部每次从下标0开始，往右操作len-1-idx-1次，每次将相对最大的往右移动
                 for (int jdx = 0; jdx < len - idx - 1; jdx++) {
                     if (arr[jdx].compareTo(arr[jdx + 1]) > 0) {
                         T t = arr[jdx + 1];
                         arr[jdx + 1] = arr[jdx];
                         arr[jdx] = t;
+                        sorted = false;
                     }
+                }
+                if (sorted) {
+                    // 恰好已经排好序，直接跳出
+                    break;
                 }
             }
             return Lists.newArrayList(arr);
