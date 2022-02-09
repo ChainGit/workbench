@@ -4,6 +4,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.IteratorUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -24,55 +25,135 @@ public class Sort {
         List<Integer> lst = Arrays.stream(RandomUtil.randomInts(1000))
                 .boxed().collect(Collectors.toList());
         ConsoleUtils.sout(lst);
+        ConsoleUtils.sout(lst.size());
 
-        List<Integer> res = bubble(lst);
+        SortAlgorithms<Integer> sortAlgorithms = new SortAlgorithms<>();
+
+        List<Integer> res = null;
+
+        //res = sortAlgorithms.bubble(lst);
+        res = sortAlgorithms.select(lst);
 
         ConsoleUtils.sout(res);
-        ConsoleUtils.sout(ArrayUtils.isSorted(res.toArray(new Integer[0])));
+        ConsoleUtils.sout(res.size());
+        //ConsoleUtils.sout(ArrayUtils.isSorted(res.toArray(new Integer[0])));
+
+        Collections.sort(lst);
+        String src = StringUtils.joinWith(StringUtils.SPACE, lst);
+        String dst = StringUtils.joinWith(StringUtils.SPACE, res);
+        ConsoleUtils.sout(Objects.equals(src, dst));
     }
 
     /**
-     * 冒泡排序是一种简单的排序算法。它重复地走访过要排序的数列，一次比较两个元素，如果它们的顺序错误就把它们交换过来。
-     * 走访数列的工作是重复地进行直到没有再需要交换，也就是说该数列已经排序完成。
-     * 这个算法的名字由来是因为越小的元素会经由交换慢慢“浮”到数列的顶端。
+     * 十种常见排序算法可以分为两大类：
      * <p>
-     * 算法描述：
-     * 1、比较相邻的元素。如果第一个比第二个大，就交换它们两个；
-     * 2、对每一对相邻元素作同样的工作，从开始第一对到结尾的最后一对，这样在最后的元素应该会是最大的数；
-     * 3、针对所有的元素重复以上的步骤，除了最后一个；
-     * 重复步骤1~3，直到排序完成。
+     * 比较类排序：通过比较来决定元素间的相对次序，由于其时间复杂度不能突破O(nlogn)，因此也称为非线性时间比较类排序。
+     * 非比较类排序：不通过比较来决定元素间的相对次序，它可以突破基于比较排序的时间下界，以线性时间运行，因此也称为线性时间非比较类排序。
+     * <p>
+     * 参考博客 @link(https://www.cnblogs.com/onepixel/p/7674659.html)
      */
-    public static <T extends Comparable<? super T>> List<T> bubble(Iterable<T> itr) {
-        T[] arr = toArr(itr);
-        if (arr == null) {
-            return null;
-        }
-        int len = arr.length;
-        // 外部循环len-1次
-        for (int idx = 0; idx < len; idx++) {
-            // 内部每次从下标0开始，往右操作len-1-idx-1次，每次将相对最大的往右移动
-            for (int jdx = 0; jdx < len - idx - 1; jdx++) {
-                if (arr[jdx].compareTo(arr[jdx + 1]) > 0) {
-                    T t = arr[jdx + 1];
-                    arr[jdx + 1] = arr[jdx];
-                    arr[jdx] = t;
+    static class SortAlgorithms<T extends Comparable<? super T>> {
+
+        /*
+         * 比较类排序：
+         * 交换（冒泡、快速），插入（简单插入排序、希尔排序），选择（简单选择排序、堆排序），归并（二路归并排序、多路归并排序）
+         * 非比较类排序：
+         * 计数排序、基数排序、桶排序
+         *
+         * 相关概念：
+         * 稳定：如果a原本在b前面，而a=b，排序之后a仍然在b的前面。
+         * 不稳定：如果a原本在b的前面，而a=b，排序之后 a 可能会出现在 b 的后面。
+         * 时间复杂度：对排序数据的总的操作次数。反映当n变化时，操作次数呈现什么规律。
+         * 空间复杂度：是指算法在计算机内执行时所需存储空间的度量，它也是数据规模n的函数。
+         *
+         * 各排序算法复杂度：
+         *
+         */
+
+        /**
+         * 选择排序(Selection-sort)是一种简单直观的排序算法。
+         * 它的工作原理：
+         * 首先在未排序序列中找到最小（大）元素，存放到排序序列的起始位置，
+         * 然后，再从剩余未排序元素中继续寻找最小（大）元素，然后放到已排序序列的末尾。
+         * 以此类推，直到所有元素均排序完毕。
+         * <p>
+         * 算法描述：
+         * n个记录的直接选择排序可经过n-1趟直接选择排序得到有序结果。
+         * <p>
+         * 具体算法描述如下：
+         * 1、初始状态：无序区为R[1..n]，有序区为空；
+         * 2、第i趟排序(i=1,2,3…n-1)开始时，当前有序区和无序区分别为R[1..i-1]和R(i..n）。
+         * 该趟排序从当前无序区中-选出关键字最小的记录 R[k]，将它与无序区的第1个记录R交换，
+         * 使R[1..i]和R[i+1..n)分别变为记录个数增加1个的新有序区和记录个数减少1个的新无序区；
+         * 3、n-1趟结束，数组有序化了。
+         */
+        public List<T> select(Iterable<T> itr) {
+            T[] arr = toArr(itr);
+            if (arr == null) {
+                return Lists.newArrayList();
+            }
+            int len = arr.length;
+            for (int idx = 0; idx < len - 1; idx++) {
+                int mdx = idx;
+                for (int jdx = idx + 1; jdx < len; jdx++) {
+                    if (arr[mdx].compareTo(arr[jdx]) > 0) {
+                        mdx = jdx;
+                    }
+                }
+                if (mdx != idx) {
+                    T tmp = arr[idx];
+                    arr[idx] = arr[mdx];
+                    arr[mdx] = tmp;
                 }
             }
+            return Lists.newArrayList(arr);
         }
-        return Lists.newArrayList(arr);
-    }
 
-    private static <T> T[] toArr(Iterable<T> itr) {
-        List<T> lst = IteratorUtils.toList(itr.iterator());
-        int size = lst.size();
-        if (size < 1) {
-            return null;
+        /**
+         * 冒泡排序是一种简单的排序算法。
+         * 它重复地走访过要排序的数列，一次比较两个元素，如果它们的顺序错误就把它们交换过来。
+         * 走访数列的工作是重复地进行直到没有再需要交换，也就是说该数列已经排序完成。
+         * 这个算法的名字由来是因为越小的元素会经由交换慢慢“浮”到数列的顶端。
+         * <p>
+         * 算法描述：
+         * 1、比较相邻的元素。如果第一个比第二个大，就交换它们两个；
+         * 2、对每一对相邻元素作同样的工作，从开始第一对到结尾的最后一对，这样在最后的元素应该会是最大的数；
+         * 3、针对所有的元素重复以上的步骤，除了最后一个；
+         * 重复步骤1~3，直到排序完成。
+         */
+        public List<T> bubble(Iterable<T> itr) {
+            T[] arr = toArr(itr);
+            if (arr == null) {
+                return Lists.newArrayList();
+            }
+            int len = arr.length;
+            // 外部循环len-1次
+            for (int idx = 0; idx < len; idx++) {
+                // 内部每次从下标0开始，往右操作len-1-idx-1次，每次将相对最大的往右移动
+                for (int jdx = 0; jdx < len - idx - 1; jdx++) {
+                    if (arr[jdx].compareTo(arr[jdx + 1]) > 0) {
+                        T t = arr[jdx + 1];
+                        arr[jdx + 1] = arr[jdx];
+                        arr[jdx] = t;
+                    }
+                }
+            }
+            return Lists.newArrayList(arr);
         }
-        T[] arr = (T[]) Array.newInstance(lst.get(0).getClass(), size);
-        for (int idx = 0; idx < size; idx++) {
-            arr[idx] = lst.get(idx);
+
+        private T[] toArr(Iterable<T> itr) {
+            List<T> lst = IteratorUtils.toList(itr.iterator());
+            int size = lst.size();
+            if (size < 1) {
+                return null;
+            }
+            T[] arr = (T[]) Array.newInstance(lst.get(0).getClass(), size);
+            for (int idx = 0; idx < size; idx++) {
+                arr[idx] = lst.get(idx);
+            }
+            return (T[]) arr;
         }
-        return (T[]) arr;
+
     }
 
 }
