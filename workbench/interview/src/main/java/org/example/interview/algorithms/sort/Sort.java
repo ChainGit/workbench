@@ -2,17 +2,14 @@ package org.example.interview.algorithms.sort;
 
 import cn.hutool.core.util.RandomUtil;
 import com.google.common.collect.Lists;
-import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.IteratorUtils;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.example.core.util.ConsoleUtils;
 
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -22,26 +19,42 @@ import java.util.stream.Collectors;
 public class Sort {
 
     public static void main(String[] args) {
-        List<Integer> lst = Arrays.stream(RandomUtil.randomInts(1000))
-                .boxed().collect(Collectors.toList());
+        SortAlgorithms<Integer> sortAlgorithms = new SortAlgorithms<>();
+        invoke("冒泡排序", sortAlgorithms::bubble);
+        invoke("选择排序", sortAlgorithms::select);
+        invoke("插入排序", sortAlgorithms::insert);
+    }
+
+    private static void invoke(String tip, Function<List<Integer>, List<Integer>> fun) {
+        List<Integer> ori = Arrays.stream(RandomUtil.randomInts(
+                RandomUtil.randomInt(1000, 5000))).boxed().collect(Collectors.toList());
+        prepare(ori, tip);
+        List<Integer> res = fun.apply(ori);
+        verify(ori, res, tip);
+    }
+
+    private static void prepare(List<Integer> lst, String tip) {
+        Collections.shuffle(lst);
+        ConsoleUtils.sout("----------------------------------");
+        ConsoleUtils.sout(tip);
         ConsoleUtils.sout(lst);
         ConsoleUtils.sout(lst.size());
+    }
 
-        SortAlgorithms<Integer> sortAlgorithms = new SortAlgorithms<>();
-
-        List<Integer> res = null;
-
-        res = sortAlgorithms.bubble(lst);
-        //res = sortAlgorithms.select(lst);
-
+    private static void verify(List<Integer> lst, List<Integer> res, String tip) {
         ConsoleUtils.sout(res);
         ConsoleUtils.sout(res.size());
         //ConsoleUtils.sout(ArrayUtils.isSorted(res.toArray(new Integer[0])));
 
-        Collections.sort(lst);
-        String src = StringUtils.joinWith(StringUtils.SPACE, lst);
+        List<Integer> ori = Lists.newArrayList(lst);
+        Collections.sort(ori);
+        String src = StringUtils.joinWith(StringUtils.SPACE, ori);
         String dst = StringUtils.joinWith(StringUtils.SPACE, res);
-        ConsoleUtils.sout(Objects.equals(src, dst));
+        boolean equals = Objects.equals(src, dst);
+        ConsoleUtils.sout(equals);
+        if (!equals) {
+            throw new RuntimeException("排序异常:" + tip);
+        }
     }
 
     /**
@@ -84,12 +97,37 @@ public class Sort {
          * 5、将新元素插入到该位置后；
          * 重复步骤2~5。
          */
+        /*
+         * 插入排序 比较(read)次数较多，移动(write)次数较多
+         * 时间复杂度 平均O(n2)，最好O(n)，最差O(n2)
+         * 空间复杂度 O(1)
+         * 比较类排序、插入排序、稳定排序
+         */
         public List<T> insert(Iterable<T> itr) {
             T[] arr = toArr(itr);
             if (arr == null) {
                 return Lists.newArrayList();
             }
-            return null;
+            int len = arr.length;
+            for (int idx = 1; idx < len; idx++) {
+                int pdx = idx;
+                for (int jdx = 0; jdx < idx; jdx++) {
+                    if (arr[idx].compareTo(arr[jdx]) < 0) {
+                        // 找到插入位置
+                        pdx = jdx;
+                        break;
+                    }
+                }
+                if (pdx != idx) {
+                    // 移动从pdx到idx-1段往右，并将原idx放在pdx处
+                    T tmp = arr[idx];
+                    for (int mdx = idx; mdx > pdx; mdx--) {
+                        arr[mdx] = arr[mdx - 1];
+                    }
+                    arr[pdx] = tmp;
+                }
+            }
+            return Lists.newArrayList(arr);
         }
 
         /**
@@ -110,7 +148,7 @@ public class Sort {
          * 3、n-1趟结束，数组有序化了。
          */
         /*
-         * 选择 比较(read)次数较多，移动(write)次数较少
+         * 选择排序 比较(read)次数较多，移动(write)次数较少
          * 时间复杂度 平均O(n2)，最好O(n2)，最差O(n2)
          * 空间复杂度 O(1)
          * 比较类排序、选择排序、不稳定排序
