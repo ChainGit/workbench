@@ -31,8 +31,8 @@ public class Sort {
 
         List<Integer> res = null;
 
-        //res = sortAlgorithms.bubble(lst);
-        res = sortAlgorithms.select(lst);
+        res = sortAlgorithms.bubble(lst);
+        //res = sortAlgorithms.select(lst);
 
         ConsoleUtils.sout(res);
         ConsoleUtils.sout(res.size());
@@ -89,6 +89,7 @@ public class Sort {
             if (arr == null) {
                 return Lists.newArrayList();
             }
+            return null;
         }
 
         /**
@@ -107,6 +108,12 @@ public class Sort {
          * 该趟排序从当前无序区中-选出关键字最小的记录 R[k]，将它与无序区的第1个记录R交换，
          * 使R[1..i]和R[i+1..n)分别变为记录个数增加1个的新有序区和记录个数减少1个的新无序区；
          * 3、n-1趟结束，数组有序化了。
+         */
+        /*
+         * 选择 比较(read)次数较多，移动(write)次数较少
+         * 时间复杂度 平均O(n2)，最好O(n2)，最差O(n2)
+         * 空间复杂度 O(1)
+         * 比较类排序、选择排序、不稳定排序
          */
         public List<T> select(Iterable<T> itr) {
             T[] arr = toArr(itr);
@@ -147,7 +154,7 @@ public class Sort {
          * 冒泡 逐个两两比较，可能需要频繁移动
          * 时间复杂度 平均O(n2)，最好O(n)，最差O(n2)
          * 空间复杂度 O(1)
-         * 稳定排序
+         * 比较类排序、交换排序、稳定排序
          * 改进：鸡尾酒排序（即内部两次循环，先将大的往右边移动，然后再将小的往左侧移动）
          */
         public List<T> bubble(Iterable<T> itr) {
