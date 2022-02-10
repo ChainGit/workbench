@@ -4,6 +4,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.example.core.util.ConsoleUtils;
 
 import java.lang.reflect.Array;
@@ -18,34 +19,48 @@ import java.util.stream.Collectors;
  */
 public class Sort {
 
+    private static final boolean PRINT_LST_DETAIL = false;
+    private static final int RAND_INTS_MIN = 50000;
+    private static final int RAND_INTS_MAX = 60000;
+
     public static void main(String[] args) {
         SortAlgorithms<Integer> sortAlgorithms = new SortAlgorithms<>();
         invoke("冒泡排序", sortAlgorithms::bubble);
         invoke("选择排序", sortAlgorithms::select);
         invoke("插入排序", sortAlgorithms::insert);
+        invoke("希尔排序", sortAlgorithms::shell);
     }
 
     private static void invoke(String tip, Function<List<Integer>, List<Integer>> fun) {
         List<Integer> ori = Arrays.stream(RandomUtil.randomInts(
-                RandomUtil.randomInt(1000, 5000))).boxed().collect(Collectors.toList());
+                RandomUtil.randomInt(RAND_INTS_MIN, RAND_INTS_MAX)))
+                .boxed().collect(Collectors.toList());
         prepare(ori, tip);
+        StopWatch sw = StopWatch.createStarted();
         List<Integer> res = fun.apply(ori);
-        verify(ori, res, tip);
+        sw.stop();
+        verify(ori, res, tip, sw.getTime());
     }
 
     private static void prepare(List<Integer> lst, String tip) {
         Collections.shuffle(lst);
         ConsoleUtils.sout("----------------------------------");
         ConsoleUtils.sout(tip);
-        ConsoleUtils.sout(lst);
+        if (PRINT_LST_DETAIL) {
+            ConsoleUtils.sout(lst);
+        }
         ConsoleUtils.sout(lst.size());
     }
 
-    private static void verify(List<Integer> lst, List<Integer> res, String tip) {
-        ConsoleUtils.sout(res);
+    private static void verify(List<Integer> lst, List<Integer> res, String tip, long cost) {
+        if (PRINT_LST_DETAIL) {
+            ConsoleUtils.sout(res);
+        }
         ConsoleUtils.sout(res.size());
-        //ConsoleUtils.sout(ArrayUtils.isSorted(res.toArray(new Integer[0])));
 
+        ConsoleUtils.sout(cost);
+
+        //ConsoleUtils.sout(ArrayUtils.isSorted(res.toArray(new Integer[0])));
         List<Integer> ori = Lists.newArrayList(lst);
         Collections.sort(ori);
         String src = StringUtils.joinWith(StringUtils.SPACE, ori);
@@ -83,10 +98,61 @@ public class Sort {
          * 冒泡排序：稳定，时间复杂度(平均On2最好On最差On2)，空间复杂度(O1)
          * 选择排序：不稳定，时间复杂度(平均On2最好On2最差On2)，空间复杂度(O1)
          * 插入排序：稳定，时间复杂度(平均On2最好On最差On2)，空间复杂度(O1)
-         * 
+         *
          *
          *
          */
+
+
+        /**
+         * 1959年Shell发明，第一个突破O(n2)的排序算法，是简单插入排序的改进版。
+         * 它与插入排序的不同之处在于，它会优先比较距离较远的元素。希尔排序又叫缩小增量排序。
+         * <p>
+         * 算法描述：
+         * 先将整个待排序的记录序列分割成为若干子序列分别进行直接插入排序。
+         * 具体算法描述：
+         * 选择一个增量序列t1，t2，…，tk，其中ti>tj，tk=1；
+         * 按增量序列个数k，对序列进行k 趟排序；
+         * 每趟排序，根据对应的增量ti，将待排序列分割成若干长度为m 的子序列，分别对各子表进行直接插入排序。
+         * 仅增量因子为1 时，整个序列作为一个表来处理，表长度即为整个序列的长度。
+         * <p>
+         * 希尔排序的核心在于间隔序列的设定。既可以提前设定好间隔序列，也可以动态的定义间隔序列。
+         * 动态定义间隔序列的算法是《算法（第4版）》的合著者Robert Sedgewick提出的。
+         */
+        /*
+         * 希尔排序 比较(read)次数较多，移动(write)次数较多
+         * 时间复杂度 平均O(n1.3)，最好O(n)，最差O(n2)
+         * 空间复杂度 O(1)
+         * 比较类排序、希尔排序、不稳定排序
+         */
+        public List<T> shell(Iterable<T> itr) {
+            T[] arr = toArr(itr);
+            if (arr == null) {
+                return Lists.newArrayList();
+            }
+            int len = arr.length;
+            for (int gap = len / 2; gap > 0; gap /= 2) {
+                // 子序列可以使用冒泡排序，选择排序，插入排序。这里采用插入排序
+                for (int idx = gap; idx < len; idx += gap) {
+                    int pdx = idx;
+                    for (int jdx = 0; jdx < idx; jdx += gap) {
+                        if (arr[idx].compareTo(arr[jdx]) < 0) {
+                            pdx = jdx;
+                            break;
+                        }
+                    }
+                    if (pdx != idx) {
+                        // 挪位置
+                        T tmp = arr[idx];
+                        for (int mdx = idx; mdx > pdx; mdx -= gap) {
+                            arr[mdx] = arr[mdx - gap];
+                        }
+                        arr[pdx] = tmp;
+                    }
+                }
+            }
+            return Lists.newArrayList(arr);
+        }
 
         /**
          * 插入排序（Insertion-Sort）的算法描述是一种简单直观的排序算法。
@@ -101,6 +167,8 @@ public class Sort {
          * 4、重复步骤3，直到找到已排序的元素小于或者等于新元素的位置；
          * 5、将新元素插入到该位置后；
          * 重复步骤2~5。
+         * <p>
+         * 当数据量不多时，插入排序优于快速排序。当数据量比较大时，快速排序优先。
          */
         /*
          * 插入排序 比较(read)次数较多，移动(write)次数较多
@@ -151,6 +219,9 @@ public class Sort {
          * 该趟排序从当前无序区中-选出关键字最小的记录 R[k]，将它与无序区的第1个记录R交换，
          * 使R[1..i]和R[i+1..n)分别变为记录个数增加1个的新有序区和记录个数减少1个的新无序区；
          * 3、n-1趟结束，数组有序化了。
+         * <p>
+         * 表现最稳定的排序算法之一，因为无论什么数据进去都是O(n2)的时间复杂度，所以用到它的时候，数据规模越小越好。
+         * 唯一的好处可能就是不占用额外的内存空间了吧。理论上讲，选择排序可能也是平时排序一般人想到的最多的排序方法了吧。
          */
         /*
          * 选择排序 比较(read)次数较多，移动(write)次数较少
