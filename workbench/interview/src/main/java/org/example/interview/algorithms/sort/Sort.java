@@ -10,7 +10,6 @@ import org.example.core.util.ConsoleUtils;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -24,11 +23,12 @@ public class Sort {
     private static final int RAND_INTS_MAX = 60000;
 
     public static void main(String[] args) {
-        SortAlgorithms<Integer> sortAlgorithms = new SortAlgorithms<>();
+        SortAlgorithms<Integer> sortAlgorithms = new SortAlgorithms<>(Integer.class);
         invoke("冒泡排序", sortAlgorithms::bubble);
         invoke("选择排序", sortAlgorithms::select);
         invoke("插入排序", sortAlgorithms::insert);
         invoke("希尔排序", sortAlgorithms::shell);
+        invoke("归并排序（递归实现）", sortAlgorithms::merge);
     }
 
     private static void invoke(String tip, Function<List<Integer>, List<Integer>> fun) {
@@ -80,6 +80,7 @@ public class Sort {
      * <p>
      * 参考博客 @link(https://www.cnblogs.com/onepixel/p/7674659.html)
      */
+    @SuppressWarnings({"unchecked", "rawtype"})
     static class SortAlgorithms<T extends Comparable<? super T>> {
 
         /*
@@ -98,10 +99,116 @@ public class Sort {
          * 冒泡排序：稳定，时间复杂度(平均On2最好On最差On2)，空间复杂度(O1)
          * 选择排序：不稳定，时间复杂度(平均On2最好On2最差On2)，空间复杂度(O1)
          * 插入排序：稳定，时间复杂度(平均On2最好On最差On2)，空间复杂度(O1)
-         *
+         * 希尔排序：不稳定，时间复杂度(平均On1.3最好On最差On2)，空间复杂度(O1)
          *
          *
          */
+
+        private final Class<T> componentType;
+
+        public SortAlgorithms(Class<T> componentType) {
+            this.componentType = componentType;
+        }
+
+        /**
+         * 归并排序是建立在归并操作上的一种有效的排序算法。
+         * 该算法是采用分治法（Divide and Conquer）的一个非常典型的应用。
+         * 将已有序的子序列合并，得到完全有序的序列；
+         * 即先使每个子序列有序，再使子序列段间有序。
+         * 若将两个有序表合并成一个有序表，称为2-路归并。
+         * <p>
+         * 算法描述：
+         * 把长度为n的输入序列分成两个长度为n/2的子序列；
+         * 对这两个子序列分别采用归并排序；
+         * 将两个排序好的子序列合并成一个最终的排序序列。
+         * <p>
+         * 归并排序是一种稳定的排序方法。
+         * 和选择排序一样，归并排序的性能不受输入数据的影响，但表现比选择排序好的多，
+         * 因为始终都是O(nlogn）的时间复杂度。代价是需要额外的内存空间。
+         */
+        /*
+         * 归并排序 比较(read)次数较多，移动(write)次数较多，会有额外的空间消耗
+         * 时间复杂度 平均O(nlog2n)，最好O(nlog2n)，最差O(nlog2n)
+         * 空间复杂度 O(n)
+         * 比较类排序、规定排序、稳定排序
+         */
+        public List<T> merge(Iterable<T> itr) {
+            T[] arr = toArr(itr);
+            if (arr == null) {
+                return Lists.newArrayList();
+            }
+            int len = arr.length;
+            int lft = 0;
+            int rgt = len - 1;
+            // 递归，分治，合并
+            merge0(arr, len, lft, rgt);
+            return Lists.newArrayList(arr);
+        }
+
+        private void _merge(T[] arr, int len, int lft, int mid, int rgt) {
+            if (lft > rgt) {
+                return;
+            }
+
+            // 临时数组，用于合并两个有序子段
+            T[] tmp = (T[]) Array.newInstance(componentType, rgt - lft + 1);
+
+            // 双指针合并
+            int idx = lft;
+            int jdx = mid + 1;
+            int cur = 0;
+            while (idx <= mid || jdx <= rgt) {
+                T a = null;
+                if (idx <= mid) {
+                    a = arr[idx];
+                }
+                T b = null;
+                if (jdx <= rgt) {
+                    b = arr[jdx];
+                }
+                /*if (a == null) {
+                    tmp[cur++] = b;
+                    jdx++;
+                } else if (b == null) {
+                    tmp[cur++] = a;
+                    idx++;
+                } else if (a.compareTo(b) > 0) {
+                    tmp[cur++] = b;
+                    jdx++;
+                } else {
+                    tmp[cur++] = a;
+                    idx++;
+                }*/
+                if (a == null || (b != null && a.compareTo(b) > 0)) {
+                    tmp[cur++] = b;
+                    jdx++;
+                } else {
+                    tmp[cur++] = a;
+                    idx++;
+                }
+            }
+
+            // 将临时数组里的顺序重新赋值到源数组
+            for (int mdx = lft; mdx <= rgt; mdx++) {
+                arr[mdx] = tmp[mdx - lft];
+            }
+        }
+
+        private void merge0(T[] arr, int len, int lft, int rgt) {
+            if (lft >= rgt) {
+                // 只剩下一个元素，最小单元，直接返回
+                return;
+            }
+
+            // 中间
+            int mid = (lft + rgt) / 2;
+            // 左侧
+            merge0(arr, len, lft, mid);
+            // 右侧
+            merge0(arr, len, mid + 1, rgt);
+            // 合并左右侧
+            _merge(arr, len, lft, mid, rgt);
+        }
 
 
         /**
@@ -303,7 +410,7 @@ public class Sort {
             if (size < 1) {
                 return null;
             }
-            T[] arr = (T[]) Array.newInstance(lst.get(0).getClass(), size);
+            T[] arr = (T[]) Array.newInstance(componentType, size);
             for (int idx = 0; idx < size; idx++) {
                 arr[idx] = lst.get(idx);
             }
