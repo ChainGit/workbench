@@ -2,12 +2,14 @@ package org.example.interview.algorithms.sort;
 
 import cn.hutool.core.util.RandomUtil;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.example.core.util.ConsoleUtils;
 
 import java.lang.reflect.Array;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -22,18 +24,35 @@ public class Sort {
     private static final int RAND_INTS_MIN = 50000;
     private static final int RAND_INTS_MAX = 60000;
 
+    private static int LEN = 0;
+    private static final Map<String, String> STATS = Maps.newLinkedHashMap();
+
     public static void main(String[] args) {
+        init();
         SortAlgorithms<Integer> sortAlgorithms = new SortAlgorithms<>(Integer.class);
         invoke("冒泡排序", sortAlgorithms::bubble);
         invoke("选择排序", sortAlgorithms::select);
         invoke("插入排序", sortAlgorithms::insert);
         invoke("希尔排序", sortAlgorithms::shell);
         invoke("归并排序（递归实现）", sortAlgorithms::merge);
+        stats();
+    }
+
+    private static void init() {
+        LEN = RandomUtil.randomInt(RAND_INTS_MIN, RAND_INTS_MAX);
+    }
+
+    private static void stats() {
+        String stats = STATS.entrySet().stream()
+                .map(entry -> entry.getKey() + "：" + entry.getValue())
+                .collect(Collectors.joining("\n"));
+        ConsoleUtils.sout("----------------------------------");
+        ConsoleUtils.sout("数据数量：" + LEN);
+        ConsoleUtils.sout("性能汇总：\n" + stats);
     }
 
     private static void invoke(String tip, Function<List<Integer>, List<Integer>> fun) {
-        List<Integer> ori = Arrays.stream(RandomUtil.randomInts(
-                RandomUtil.randomInt(RAND_INTS_MIN, RAND_INTS_MAX)))
+        List<Integer> ori = Arrays.stream(RandomUtil.randomInts(LEN))
                 .boxed().collect(Collectors.toList());
         prepare(ori, tip);
         StopWatch sw = StopWatch.createStarted();
@@ -70,6 +89,8 @@ public class Sort {
         if (!equals) {
             throw new RuntimeException("排序异常:" + tip);
         }
+
+        STATS.put(tip, String.valueOf(cost));
     }
 
     /**
