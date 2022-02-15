@@ -9,7 +9,6 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.example.core.util.ConsoleUtils;
 
 import java.lang.reflect.Array;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -35,6 +34,7 @@ public class Sort {
         invoke("插入排序", sortAlgorithms::insert);
         invoke("希尔排序", sortAlgorithms::shell);
         invoke("归并排序（递归实现）", sortAlgorithms::merge);
+        invoke("归并排序（非递归实现）", sortAlgorithms::merge2);
         stats();
     }
 
@@ -87,7 +87,7 @@ public class Sort {
         boolean equals = Objects.equals(src, dst);
         ConsoleUtils.sout(equals);
         if (!equals) {
-            throw new RuntimeException("排序异常:" + tip);
+            throw new RuntimeException("排序异常：" + tip);
         }
 
         STATS.put(tip, String.valueOf(cost));
@@ -131,6 +131,34 @@ public class Sort {
             this.componentType = componentType;
         }
 
+
+        /**
+         * 非递归实现归并排序
+         */
+        public List<T> merge2(Iterable<T> itr) {
+            T[] arr = toArr(itr);
+            if (arr == null) {
+                return Lists.newArrayList();
+            }
+            int len = arr.length;
+            for (int step = 1; step < len; step <<= 1) {
+                int lft = 0;
+                int mid = lft + step - 1;
+                int rgt = mid + step;
+                while (rgt < len) {
+                    _merge(arr, len, lft, mid, rgt);
+                    lft = rgt + 1;
+                    mid = lft + step - 1;
+                    rgt = mid + step;
+                }
+                if (mid < len) {
+                    // 剩下的
+                    _merge(arr, len, lft, mid, len - 1);
+                }
+            }
+            return Lists.newArrayList(arr);
+        }
+
         /**
          * 归并排序是建立在归并操作上的一种有效的排序算法。
          * 该算法是采用分治法（Divide and Conquer）的一个非常典型的应用。
@@ -151,7 +179,7 @@ public class Sort {
          * 归并排序 比较(read)次数较多，移动(write)次数较多，会有额外的空间消耗
          * 时间复杂度 平均O(nlog2n)，最好O(nlog2n)，最差O(nlog2n)
          * 空间复杂度 O(n)
-         * 比较类排序、规定排序、稳定排序
+         * 比较类排序、归并排序、稳定排序
          */
         public List<T> merge(Iterable<T> itr) {
             T[] arr = toArr(itr);
@@ -167,7 +195,7 @@ public class Sort {
         }
 
         private void _merge(T[] arr, int len, int lft, int mid, int rgt) {
-            if (lft > rgt) {
+            if (lft >= rgt) {
                 return;
             }
 
