@@ -123,6 +123,7 @@ public class Sort {
          * 希尔排序：不稳定，时间复杂度(平均On1.3最好On最差On2)，空间复杂度(O1)
          * 归并排序：不稳定，时间复杂度(平均Onlog2n最好Onlog2n最差Onlog2n)，空间复杂度(On)
          *
+         *
          */
 
         private final Class<T> componentType;
@@ -149,8 +150,8 @@ public class Sort {
         /*
          * 快速排序 比较(read)次数较多，交换(write)次数较多，会有额外的空间消耗
          * 时间复杂度 平均O(nlog2n)，最好O(nlog2n)，最差O(n2)
-         * 空间复杂度 O(n)
-         * 比较类排序、归并排序、稳定排序
+         * 空间复杂度 O(nlog2n)
+         * 比较类排序-交换、不稳定排序
          */
         public List<T> quick(Iterable<T> itr) {
             return null;
@@ -205,7 +206,7 @@ public class Sort {
          * 归并排序 比较(read)次数较多，移动(write)次数较多，会有额外的空间消耗
          * 时间复杂度 平均O(nlog2n)，最好O(nlog2n)，最差O(nlog2n)
          * 空间复杂度 O(n)
-         * 比较类排序、归并排序、稳定排序
+         * 比较类排序-归并、稳定排序
          */
         public List<T> merge(Iterable<T> itr) {
             T[] arr = toArr(itr);
@@ -307,7 +308,7 @@ public class Sort {
          * 希尔排序 比较(read)次数较多，移动(write)次数较多
          * 时间复杂度 平均O(n1.3)，最好O(n)，最差O(n2)
          * 空间复杂度 O(1)
-         * 比较类排序、希尔排序、不稳定排序
+         * 比较类排序-插入、不稳定排序
          */
         public List<T> shell(Iterable<T> itr) {
             T[] arr = toArr(itr);
@@ -358,7 +359,7 @@ public class Sort {
          * 插入排序 比较(read)次数较多，移动(write)次数较多
          * 时间复杂度 平均O(n2)，最好O(n)，最差O(n2)
          * 空间复杂度 O(1)
-         * 比较类排序、插入排序、稳定排序
+         * 比较类排序-插入、稳定排序
          */
         public List<T> insert(Iterable<T> itr) {
             T[] arr = toArr(itr);
@@ -411,7 +412,7 @@ public class Sort {
          * 选择排序 比较(read)次数较多，移动(write)次数较少
          * 时间复杂度 平均O(n2)，最好O(n2)，最差O(n2)
          * 空间复杂度 O(1)
-         * 比较类排序、选择排序、不稳定排序
+         * 比较类排序-选择、不稳定排序
          */
         public List<T> select(Iterable<T> itr) {
             T[] arr = toArr(itr);
@@ -452,7 +453,7 @@ public class Sort {
          * 冒泡 逐个两两比较，可能需要频繁移动
          * 时间复杂度 平均O(n2)，最好O(n)，最差O(n2)
          * 空间复杂度 O(1)
-         * 比较类排序、交换排序、稳定排序
+         * 比较类排序-交换、稳定排序
          * 改进：鸡尾酒排序（即内部两次循环，先将大的往右边移动，然后再将小的往左侧移动）
          */
         public List<T> bubble(Iterable<T> itr) {
