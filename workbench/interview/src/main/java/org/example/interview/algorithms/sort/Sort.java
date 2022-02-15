@@ -121,7 +121,7 @@ public class Sort {
          * 选择排序：不稳定，时间复杂度(平均On2最好On2最差On2)，空间复杂度(O1)
          * 插入排序：稳定，时间复杂度(平均On2最好On最差On2)，空间复杂度(O1)
          * 希尔排序：不稳定，时间复杂度(平均On1.3最好On最差On2)，空间复杂度(O1)
-         *
+         * 归并排序：不稳定，时间复杂度(平均Onlog2n最好Onlog2n最差Onlog2n)，空间复杂度(On)
          *
          */
 
@@ -131,6 +131,30 @@ public class Sort {
             this.componentType = componentType;
         }
 
+        /**
+         * 快速排序的基本思想：
+         * 通过一趟排序将待排记录分隔成独立的两部分，
+         * 其中一部分记录的关键字均比另一部分的关键字小，
+         * 则可分别对这两部分记录继续进行排序，以达到整个序列有序。
+         * <p>
+         * 算法描述：
+         * 快速排序使用分治法来把一个串（list）分为两个子串（sub-lists）。
+         * <p>
+         * 具体算法描述如下：
+         * 从数列中挑出一个元素，称为 “基准”（pivot）；
+         * 重新排序数列，所有元素比基准值小的摆放在基准前面，所有元素比基准值大的摆在基准的后面（相同的数可以到任一边）。
+         * 在这个分区退出之后，该基准就处于数列的中间位置。这个称为分区（partition）操作；
+         * 递归地（recursive）把小于基准值元素的子数列和大于基准值元素的子数列排序。
+         */
+        /*
+         * 快速排序 比较(read)次数较多，交换(write)次数较多，会有额外的空间消耗
+         * 时间复杂度 平均O(nlog2n)，最好O(nlog2n)，最差O(n2)
+         * 空间复杂度 O(n)
+         * 比较类排序、归并排序、稳定排序
+         */
+        public List<T> quick(Iterable<T> itr) {
+            return null;
+        }
 
         /**
          * 非递归实现归并排序
@@ -141,19 +165,21 @@ public class Sort {
                 return Lists.newArrayList();
             }
             int len = arr.length;
+            // 额外的空间，O(n)
+            T[] tmp = (T[]) Array.newInstance(componentType, len);
             for (int step = 1; step < len; step <<= 1) {
                 int lft = 0;
                 int mid = lft + step - 1;
                 int rgt = mid + step;
                 while (rgt < len) {
-                    _merge(arr, len, lft, mid, rgt);
+                    _merge(arr, tmp, lft, mid, rgt);
                     lft = rgt + 1;
                     mid = lft + step - 1;
                     rgt = mid + step;
                 }
                 if (mid < len) {
                     // 剩下的
-                    _merge(arr, len, lft, mid, len - 1);
+                    _merge(arr, tmp, lft, mid, len - 1);
                 }
             }
             return Lists.newArrayList(arr);
@@ -189,23 +215,25 @@ public class Sort {
             int len = arr.length;
             int lft = 0;
             int rgt = len - 1;
+            // 额外的空间，O(n)
+            T[] tmp = (T[]) Array.newInstance(componentType, len);
             // 递归，分治，合并
-            merge0(arr, len, lft, rgt);
+            merge0(arr, tmp, lft, rgt);
             return Lists.newArrayList(arr);
         }
 
-        private void _merge(T[] arr, int len, int lft, int mid, int rgt) {
+        private void _merge(T[] arr, T[] tmp, int lft, int mid, int rgt) {
             if (lft >= rgt) {
                 return;
             }
 
             // 临时数组，用于合并两个有序子段
-            T[] tmp = (T[]) Array.newInstance(componentType, rgt - lft + 1);
+            //T[] tmp = (T[]) Array.newInstance(componentType, rgt - lft + 1);
 
             // 双指针合并
             int idx = lft;
             int jdx = mid + 1;
-            int cur = 0;
+            int cur = lft;
             while (idx <= mid || jdx <= rgt) {
                 T a = null;
                 if (idx <= mid) {
@@ -239,11 +267,11 @@ public class Sort {
 
             // 将临时数组里的顺序重新赋值到源数组
             for (int mdx = lft; mdx <= rgt; mdx++) {
-                arr[mdx] = tmp[mdx - lft];
+                arr[mdx] = tmp[mdx];
             }
         }
 
-        private void merge0(T[] arr, int len, int lft, int rgt) {
+        private void merge0(T[] arr, T[] tmp, int lft, int rgt) {
             if (lft >= rgt) {
                 // 只剩下一个元素，最小单元，直接返回
                 return;
@@ -252,11 +280,11 @@ public class Sort {
             // 中间
             int mid = (lft + rgt) / 2;
             // 左侧
-            merge0(arr, len, lft, mid);
+            merge0(arr, tmp, lft, mid);
             // 右侧
-            merge0(arr, len, mid + 1, rgt);
+            merge0(arr, tmp, mid + 1, rgt);
             // 合并左右侧
-            _merge(arr, len, lft, mid, rgt);
+            _merge(arr, tmp, lft, mid, rgt);
         }
 
 
