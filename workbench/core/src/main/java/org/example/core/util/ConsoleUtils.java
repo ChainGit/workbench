@@ -2,6 +2,13 @@ package org.example.core.util;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.google.common.collect.Lists;
+import lombok.SneakyThrows;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author qbq
@@ -10,7 +17,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 public class ConsoleUtils {
 
     public static void souts(Object... objs) {
-        sout(objs);
+        sout(Lists.newArrayList(objs));
     }
 
     public static void sout(Object obj) {

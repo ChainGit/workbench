@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
  */
 public class Sort {
 
-    private static final boolean PRINT_LST_DETAIL = false;
-    private static final int RAND_INTS_MIN = 50000;
-    private static final int RAND_INTS_MAX = 60000;
+    private static final boolean PRINT_LST_DETAIL = true;
+    private static final int RAND_INTS_MIN = 10;
+    private static final int RAND_INTS_MAX = 20;
 
     private static int LEN = 0;
     private static final Map<String, String> STATS = Maps.newLinkedHashMap();
@@ -35,6 +35,7 @@ public class Sort {
         invoke("希尔排序", sortAlgorithms::shell);
         invoke("归并排序（递归实现）", sortAlgorithms::merge);
         invoke("归并排序（非递归实现）", sortAlgorithms::merge2);
+        invoke("快速排序（递归实现）", sortAlgorithms::quick);
         stats();
     }
 
@@ -154,7 +155,54 @@ public class Sort {
          * 比较类排序-交换、不稳定排序
          */
         public List<T> quick(Iterable<T> itr) {
-            return null;
+            T[] arr = toArr(itr);
+            if (arr == null) {
+                return Lists.newArrayList();
+            }
+            int len = arr.length;
+            int lft = 0;
+            int rgt = len - 1;
+            quick0(arr, lft, rgt);
+            return Lists.newArrayList(arr);
+        }
+
+        private void quick0(T[] arr, int lft, int rgt) {
+            if (lft >= rgt) {
+                return;
+            }
+
+            // 分区并确定标杆，比标杆小的在左侧，比标杆大的在右侧
+            int flg = partition(arr, lft, rgt);
+            // 左侧
+            quick0(arr, lft, flg - 1);
+            // 右侧
+            quick0(arr, flg + 1, rgt);
+        }
+
+        private int partition(T[] arr, int lft, int rgt) {
+            ConsoleUtils.souts("before", Lists.newArrayList(Arrays.copyOfRange(arr, lft, rgt)));
+            // 标杆
+            final int flg = lft;
+            // 双指针
+            int idx = lft + 1;
+            int jdx = rgt;
+            while (idx < jdx) {
+                while (compare(arr[flg], arr[idx]) > 0 && idx < jdx) {
+                    idx++;
+                }
+                while (compare(arr[flg], arr[jdx]) < 0 && idx < jdx) {
+                    jdx--;
+                }
+                if (idx >= jdx) {
+                    break;
+                }
+                swap(arr, idx, jdx);
+            }
+            //此时idx==jdx
+            swap(arr, flg, jdx);
+            ConsoleUtils.souts("after", Lists.newArrayList(Arrays.copyOfRange(arr, lft, rgt)));
+            //此时标杆的下标是idx
+            return jdx;
         }
 
         /**
@@ -257,7 +305,7 @@ public class Sort {
                     tmp[cur++] = a;
                     idx++;
                 }*/
-                if (a == null || (b != null && a.compareTo(b) > 0)) {
+                if (a == null || (b != null && compare(a, b) > 0)) {
                     tmp[cur++] = b;
                     jdx++;
                 } else {
@@ -321,7 +369,7 @@ public class Sort {
                 for (int idx = gap; idx < len; idx += gap) {
                     int pdx = idx;
                     for (int jdx = 0; jdx < idx; jdx += gap) {
-                        if (arr[idx].compareTo(arr[jdx]) < 0) {
+                        if (compare(arr[idx], arr[jdx]) < 0) {
                             pdx = jdx;
                             break;
                         }
@@ -370,7 +418,7 @@ public class Sort {
             for (int idx = 1; idx < len; idx++) {
                 int pdx = idx;
                 for (int jdx = 0; jdx < idx; jdx++) {
-                    if (arr[idx].compareTo(arr[jdx]) < 0) {
+                    if (compare(arr[idx], arr[jdx]) < 0) {
                         // 找到插入位置
                         pdx = jdx;
                         break;
@@ -423,15 +471,12 @@ public class Sort {
             for (int idx = 0; idx < len - 1; idx++) {
                 int mdx = idx;
                 for (int jdx = idx + 1; jdx < len; jdx++) {
-                    if (arr[mdx].compareTo(arr[jdx]) > 0) {
+                    if (compare(arr[mdx], arr[jdx]) > 0) {
                         mdx = jdx;
                     }
                 }
                 if (mdx != idx) {
-                    // 两两交换
-                    T tmp = arr[idx];
-                    arr[idx] = arr[mdx];
-                    arr[mdx] = tmp;
+                    swap((T[]) arr, idx, mdx);
                 }
             }
             return Lists.newArrayList(arr);
@@ -467,10 +512,8 @@ public class Sort {
                 boolean sorted = true;
                 // 内部每次从下标0开始，往右操作len-1-idx-1次，每次将相对最大的往右移动
                 for (int jdx = 0; jdx < len - idx - 1; jdx++) {
-                    if (arr[jdx].compareTo(arr[jdx + 1]) > 0) {
-                        T t = arr[jdx + 1];
-                        arr[jdx + 1] = arr[jdx];
-                        arr[jdx] = t;
+                    if (compare(arr[jdx], arr[jdx + 1]) > 0) {
+                        swap(arr, jdx + 1, jdx);
                         sorted = false;
                     }
                 }
@@ -480,6 +523,17 @@ public class Sort {
                 }
             }
             return Lists.newArrayList(arr);
+        }
+
+        private int compare(T a, T b) {
+            return a.compareTo(b);
+        }
+
+        private void swap(T[] arr, int idx, int jdx) {
+            // 两两交换
+            T tmp = arr[idx];
+            arr[idx] = arr[jdx];
+            arr[jdx] = tmp;
         }
 
         private T[] toArr(Iterable<T> itr) {
