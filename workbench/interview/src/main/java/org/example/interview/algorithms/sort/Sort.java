@@ -19,9 +19,11 @@ import java.util.stream.Collectors;
  */
 public class Sort {
 
-    private static final boolean PRINT_LST_DETAIL = true;
-    private static final int RAND_INTS_MIN = 10;
-    private static final int RAND_INTS_MAX = 20;
+    private static final boolean PRINT_LST_DETAIL = false;
+    private static final int RAND_LEN_MIN = 10000;
+    private static final int RAND_LEN_MAX = 20000;
+    private static final int RAND_VAL_MIN = -1000;
+    private static final int RAND_VAL_MAX = 10000;
 
     private static int LEN = 0;
     private static final Map<String, String> STATS = Maps.newLinkedHashMap();
@@ -40,7 +42,7 @@ public class Sort {
     }
 
     private static void init() {
-        LEN = RandomUtil.randomInt(RAND_INTS_MIN, RAND_INTS_MAX);
+        LEN = RandomUtil.randomInt(RAND_LEN_MIN, RAND_LEN_MAX);
     }
 
     private static void stats() {
@@ -53,13 +55,22 @@ public class Sort {
     }
 
     private static void invoke(String tip, Function<List<Integer>, List<Integer>> fun) {
-        List<Integer> ori = Arrays.stream(RandomUtil.randomInts(LEN))
+        List<Integer> ori = Arrays.stream(randomInts())
                 .boxed().collect(Collectors.toList());
         prepare(ori, tip);
         StopWatch sw = StopWatch.createStarted();
         List<Integer> res = fun.apply(ori);
         sw.stop();
         verify(ori, res, tip, sw.getTime());
+    }
+
+    private static int[] randomInts() {
+        int[] arr = new int[LEN];
+        for (int idx = 0; idx < LEN; idx++) {
+            // 允许负数、重复
+            arr[idx] = RandomUtil.randomInt(RAND_VAL_MIN, RAND_VAL_MAX);
+        }
+        return arr;
     }
 
     private static void prepare(List<Integer> lst, String tip) {
@@ -180,18 +191,20 @@ public class Sort {
         }
 
         private int partition(T[] arr, int lft, int rgt) {
-            ConsoleUtils.souts("before", Lists.newArrayList(Arrays.copyOfRange(arr, lft, rgt)));
             // 标杆
-            final int flg = lft;
+            final int key = lft;
+            final T val = arr[key];
             // 双指针
-            int idx = lft + 1;
+            int idx = lft;
             int jdx = rgt;
-            while (idx < jdx) {
-                while (compare(arr[flg], arr[idx]) > 0 && idx < jdx) {
-                    idx++;
-                }
-                while (compare(arr[flg], arr[jdx]) < 0 && idx < jdx) {
+            while (true) {
+                // 先移动右指针，直到找到比标杆小的
+                while (idx < jdx && compare(val, arr[jdx]) <= 0) {
                     jdx--;
+                }
+                // 后移动左指针，直到找到比标杆大的
+                while (idx < jdx && compare(val, arr[idx]) >= 0) {
+                    idx++;
                 }
                 if (idx >= jdx) {
                     break;
@@ -199,10 +212,10 @@ public class Sort {
                 swap(arr, idx, jdx);
             }
             //此时idx==jdx
-            swap(arr, flg, jdx);
-            ConsoleUtils.souts("after", Lists.newArrayList(Arrays.copyOfRange(arr, lft, rgt)));
+            arr[lft] = arr[idx];
+            arr[idx] = val;
             //此时标杆的下标是idx
-            return jdx;
+            return idx;
         }
 
         /**
